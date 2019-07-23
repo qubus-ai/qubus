@@ -1,0 +1,27 @@
+<div class="container">
+    <mat-list class="list-container">
+        <mat-list-item class="actions">
+            <button (click)="addProject()" color="primary" mat-mini-fab>+</button>
+        </mat-list-item>
+        <mat-list-item *ngFor="let project of projects; let i=index">
+            <mat-icon mat-list-icon color="primary">photo_library</mat-icon>
+            <h3 matLine>{{project.name}}</h3>
+            <p matLine>{{project.path}}</p>
+            <p matLine>{{project.comment}}</p>
+            <task-progress matLine [task]="taskService.getTask(project)"></task-progress>
+            <button mat-icon-button color="primary" (click)="openProjectMap(i)">
+                <mat-icon aria-label="Edit project">map</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="openProjectGrid(i)">
+                <mat-icon aria-label="Edit project">view_module</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="editProject(i)">
+                <mat-icon aria-label="Edit project">edit</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="deleteProject(i)">
+                <mat-icon aria-label="Remove project">delete_outline</mat-icon>
+            </button>
+            <mat-divider></mat-divider>
+        </mat-list-item>
+    </mat-list>
+</div>

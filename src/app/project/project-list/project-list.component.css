@@ -1,0 +1,29 @@
+.container
+{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 50px;
+}
+
+.list-container
+{
+    position: relative;
+    min-width: 400px;
+    max-width: 800px;
+    width: 100%;
+}
+::ng-deep .actions .mat-list-item-content{
+    justify-content: center !important;
+}
+
+.mat-mini-fab
+{
+    order: 10;
+    margin: 2px;
+}
+
+p
+{
+    opacity: 0.54;
+}

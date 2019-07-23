@@ -1,0 +1,13 @@
+<div class="task" *ngIf="task">
+    <div class="name">Running tasks:</div>
+    <div>{{task.name}}</div>
+    <div *ngIf="running()">
+        <mat-progress-bar mode="determine" [value]="progress"></mat-progress-bar>
+    </div>
+    <div *ngIf="task.completed">
+        Completed
+    </div>
+    <div class="error" *ngIf="task.error">
+        {{task.error}}
+    </div>
+</div>

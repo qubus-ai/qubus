@@ -1,0 +1,14 @@
+.header
+{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    color: #03a9f4
+}
+
+div
+{
+    max-width: 100%;
+}

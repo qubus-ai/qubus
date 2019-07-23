@@ -1,0 +1,17 @@
+.task
+{
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.name 
+{
+    opacity: 0.54;
+}
+
+.error
+{
+    opacity: 0.54;
+    color: red;
+}

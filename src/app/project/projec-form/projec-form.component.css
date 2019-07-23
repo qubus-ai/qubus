@@ -1,0 +1,23 @@
+.container
+{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+}
+
+mat-dialog-content
+{
+    width: 100%;
+}
+
+mat-form-field
+{
+    width: 100%;
+}
+
+h1 
+{
+    color: #03a9f4;
+}

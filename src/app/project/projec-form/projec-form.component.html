@@ -1,0 +1,39 @@
+<form class="container" [formGroup]="projectForm" (ngSubmit)="submit()">
+  <h1 mat-dialog-title>{{formTitle}}</h1>
+  <div mat-dialog-content>
+    <mat-form-field>
+      <input type="text" matInput placeholder="Browse" formControlName="path" (click)="selectPath()">
+      <button mat-button mat-icon-button matSuffix (click)="selectPath()" [disabled]="getPathState()">
+        <mat-icon>more_horiz</mat-icon>
+      </button>
+      <mat-error *ngIf="path.hasError('required')">
+        Path is required.
+      </mat-error>
+      <mat-error *ngIf="path.hasError('duplicatePath')">
+        The project with this path already exists.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Name" formControlName="name">
+      <mat-error *ngIf="name.hasError('required')">
+        Name is required.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput placeholder="Description" formControlName="comment"></textarea>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Sort images by</mat-label>
+      <mat-select formControlName="imageSortType">
+        <mat-option value="1">Date</mat-option>
+        <mat-option value="2">Name</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button *ngIf="state != ProjectFormState.Read" mat-button type="submit" [disabled]="!projectForm.valid"
+      color="primary">{{submitLabel}}</button>
+    <button *ngIf="update" mat-button type="button" (click)="reinit()">Re-initialize</button>
+  </div>
+</form>

@@ -1,0 +1,34 @@
+.header
+{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    color: #03a9f4;
+}
+
+form
+{
+    margin: auto;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+}
+
+.remark
+{
+    opacity: 0.6;
+    margin: 5px
+}
+
+.remark > a
+{
+    color: #03a9f4;
+}
+
+.divider
+{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

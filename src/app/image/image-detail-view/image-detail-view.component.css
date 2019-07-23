@@ -1,0 +1,26 @@
+.panel
+{
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 999;
+}
+
+.panel mat-icon
+{
+  margin: 10px;
+}
+
+.image-view
+{
+  /*   width: 100%;*/
+    position: relative;
+    height: calc(100vh - 20px); 
+    border-radius: 4px;
+    background-color: white;
+    padding: 2px;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    margin: 10px;
+}

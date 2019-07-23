@@ -1,0 +1,22 @@
+<div class="header">
+    <h1 mat-dialog-title>Settings</h1>
+</div>
+<mat-dialog-content class="container">
+    <form [formGroup]="settingsForm">
+        <mat-slide-toggle formControlName="gm" color="primary">GraphicMagic
+        </mat-slide-toggle>
+        <div class="remark">To use this option GraphicMagic need to be installed on the machine.
+            <a (click)="openGM()">Read more....</a>
+        </div>
+        <mat-divider class="divider"></mat-divider>
+        <mat-form-field>
+            <mat-label>Maps</mat-label>
+            <mat-select formControlName="map">
+                <mat-option [value]="map.url" *ngFor="let map of mapLayers">{{map.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions class="header">
+    <button mat-button (click)="ok()" color="primary">Close</button>
+</mat-dialog-actions>

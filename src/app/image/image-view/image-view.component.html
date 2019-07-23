@@ -1,0 +1,27 @@
+<!-- <div class="blur" [style.background-image]="getUrl(image)" (click)="ccc($event)">
+</div>  -->
+<div class="container">
+    <div>
+        <button mat-mini-fab color="primary" class="preview-button" (click)="togglePreview()">List</button>
+    </div>
+    <div class="preview" *ngIf="previewVisible" [style.min-width.px]="getPreivewSize()">
+        <app-image-list></app-image-list>
+    </div>
+    <div class="view" [style.justify-content]="getJustifyContent()" [style.align-items]="getAlignItems()" #view>
+        <div class="image-container" [ngStyle]="getImageSize()">
+            <img *ngIf="image" [src]="image.getSrc()" [ngStyle]="getImageSize()">
+            <div class="image-overlay" *ngIf="imagePlacementEnabled">
+                <mat-icon color="primary" *ngIf="horizontalPlacement!=ImageHorizontalPlacement.LEFT"
+                    class="horizontalLeft" (click)="toggleHorizontal(-1)">keyboard_arrow_left</mat-icon>
+                <mat-icon color="primary" *ngIf="horizontalPlacement!=ImageHorizontalPlacement.RIGHT"
+                    class="horizontalRight" (click)="toggleHorizontal(1)">keyboard_arrow_right</mat-icon>
+                <mat-icon color="primary" class="size" (click)="toggleImageSize()">fullscreen</mat-icon>
+                <mat-icon color="primary" *ngIf="verticalPlacement!=ImageVerticalPlacement.TOP" class="verticalUp"
+                    (click)="toggleVertical(-1)">keyboard_arrow_up</mat-icon>
+                <mat-icon color="primary" *ngIf="verticalPlacement!=ImageVerticalPlacement.BOTTOM" class="verticalDown"
+                    (click)="toggleVertical(1)">keyboard_arrow_down</mat-icon>
+                <mat-icon color="primary" class="details" (click)="detailView(image)">add_comment</mat-icon>
+            </div>
+        </div>
+    </div>
+</div>

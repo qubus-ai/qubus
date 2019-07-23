@@ -1,0 +1,19 @@
+<div class="container" #scroll>
+      <cdk-virtual-scroll-viewport itemSize="202" class="scroll">
+            <div *cdkVirtualFor="let image of images;">
+                  <div class="image-container" (contextmenu)="openContextMenu($event, image)">
+                        <img (click)="selectImage(image)" [imageLoader]="image">
+                        <!--       <div class="image-overlay">
+            <mat-icon color="primary" (click)="selectImage(image)">home</mat-icon>
+      </div> -->
+                  </div>
+            </div>
+      </cdk-virtual-scroll-viewport>
+</div>
+
+<mat-menu #userMenu="matMenu">
+      <ng-template matMenuContent let-image="image">
+            <button mat-menu-item (click)="zoomTo(image)">Zoom to</button>
+            <button mat-menu-item (click)="getExif(image)">Exif</button>
+      </ng-template>
+</mat-menu>

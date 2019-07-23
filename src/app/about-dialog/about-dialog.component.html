@@ -1,0 +1,18 @@
+<div class="header">
+  <h1 mat-dialog-title>About Qubus</h1>
+</div>
+<mat-dialog-content class="container">
+  <div class=content>
+    <p>Qubus is a destktop application for management of geotagged images.
+      <span><a (click)="homepage()">Read more...</a></span>
+    </p>
+    <p>Electron: {{electron}}</p>
+    <p>Chrome: {{chrome}}</p>
+    <p>NodeJs: {{node}}</p>
+    <p>V8: {{v8}}</p>
+    <p>Commit: {{commit}}</p>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions class="header">
+  <button mat-button [mat-dialog-close]="true" color="primary">Close</button>
+</mat-dialog-actions>

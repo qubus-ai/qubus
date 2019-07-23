@@ -1,0 +1,24 @@
+<div class="container" #scroll>
+  <cdk-virtual-scroll-viewport itemSize="202" class="scroll">
+    <div *cdkVirtualFor="let row of rows;">
+      <div class="scroll-row">
+        <div class="image-container" *ngFor="let image of row" (contextmenu)="openContextMenu($event, image)">
+          <img [imageLoader]="image">
+          <div class="image-overlay">
+            <mat-icon color="primary" (click)="openImage(image)">image</mat-icon>
+            <mat-icon color="primary" (click)="mapView(image)">map</mat-icon>
+            <mat-icon color="primary" (click)="detailView(image)">add_comment</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </cdk-virtual-scroll-viewport>
+</div>
+
+<mat-menu #userMenu="matMenu">
+  <ng-template matMenuContent let-image="image">
+    <button mat-menu-item>Copy</button>
+    <button mat-menu-item>Delete</button>
+    <button mat-menu-item (click)="getExif(image)">Exif</button>
+  </ng-template>
+</mat-menu>
