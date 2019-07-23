@@ -1,0 +1,15 @@
+language: node_js
+node_js: '8'
+sudo: enabled
+dist: trusty
+install:
+- npm ci
+cache:
+  directories:
+  - "$HOME/.npm"
+os:
+  - linux
+  - osx
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run packager-mac ;fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run packager-linux ;fi
