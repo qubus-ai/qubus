@@ -40,14 +40,14 @@ Desktop application build with Angular and Electron framework for browsing geore
 * [Angular](https://angular.io/) - The frontend - GUI
 * [Electron](https://electronjs.org/) - Desktop App environment
 * [Angular Material](https://material.angular.io/) - Material Design components for Angular
-* [Electron Packager](https://github.com/electron/electron-packager) - packaging of app
+* [Electron Packager](https://github.com/electron/electron-packager) - Packaging of app
 * [Material UI Icons](https://material.io/) - For the icons
 * [npm](https://npmjs.org) - Installing packages
 * [Openlayers](https://github.com/openlayers/openlayers) - Maps
 * [Jimp](https://github.com/oliver-moran/jimp) - Image processing
 * [gm](https://github.com/aheckmann/gm) - GraphicMagic
 * [GeoJSON](https://github.com/caseycesari/GeoJSON.js) - Geojson
-* [node-exif](https://github.com/gomfunkel/node-exif)
+* [node-exif](https://github.com/gomfunkel/node-exif) - Extract of Exif metadata
 
 ## Build & Run
 
