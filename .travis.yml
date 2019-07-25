@@ -13,3 +13,13 @@ os:
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run packager-mac ;fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run packager-linux ;fi
+deploy:
+  provider: releases
+  api_key:
+    secure: "saQECc8bGFPYXdrd6QOzpjHzmgnHg/9x5gyzwVbuie0KMeS8eTl5V13dtbGnAUoOwtoNRG7jXLs4N4BYAhCwbCvyty1ln7AGw+XAt7kzzecIzuhb2PsV8LWd8ohvx4qW2mSZSjuCS6S5hm5+UKwv+oZzv03taTgFPRqkwjfjTkkS/5J4JB9s5qosDX4OptUZ0VHO6uX4TSHKaqZXfJPP6VZbJSlcImY3moBimnl+uLEbPp99fnmdMOfbPlp49Wp7NEYlYKrGNcVzi1zzyKzU6kEV0pEK041Me60fvNWNSJzxBqiNHBLE1OmZyd3re2HZdqcanGcHWB8Dyy82G1CYwZ5mZgJKbthCXHHhQAK9QlmdbLpds/998Q0XEYAcp22zyK16Mv9vPredRLVDTbxqZDXxg0gWsL78oQntUfhp3sweqfJkBA4oiXHOu9ysibizPcfUn1IUIYxjx5efIjbHlb1b631vo6WBUKQ3fb7MoXy8B8nqifcDLFBkEuSsSC8+bvCiljAEF34MjXesAQG3MiSewqTvRazr3mlDdWevw580pJDneqyqjNwtZPyGublrKRYiTvQuLGz6qXyiULVXgk/IXlqvrUxFO3xcld9qP9VTekEuRxn8q/5qGBqmR45GgGS8HOYBzho22iIpBIcpry0ieGZx037Dh8vyqshErHw="
+  file: 
+    - ./release-builds/qubus-linux-x64.tar.gz
+  skip_cleanup: true
+  on:
+    repo: https://github.com/qubus-ai/qubus
+    tags: true
