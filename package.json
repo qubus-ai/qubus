@@ -20,7 +20,8 @@
     "qubus-remote": "electron . --dev --remote",
     "packager-mac": "npm run build-release && electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/qubus_logo.icns --prune=true --out=release-builds",
     "packager-win": "npm run build-release && electron-packager . qubus --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/qubus_logo.ico --prune=true --out=release-builds --version-string.CompanyName=Qubus --version-string.FileDescription=Qubus --version-string.ProductName=\"Qubus\"",
-    "packager-linux": "npm run build-release && electron-packager . qubus --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
+    "packager-linux": "npm run build-release && electron-packager . qubus --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds && npm run tar-release",
+    "tar-release": "tar -zcvf ./release-builds/qubus-linux-x64.tar.gz -C ./release-builds ./qubus-linux-x64"
     "utils-git": "git rev-parse HEAD > ./dist/git.info"
   },
   "private": true,
