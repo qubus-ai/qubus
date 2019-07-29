@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.com/qubus-ai/qubus.svg?branch=master)](https://travis-ci.com/qubus-ai/qubus)
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/qubus-ai/qubus.svg?style=flat)
+![GitHub Release](https://img.shields.io/github/release/qubus-ai/qubus.svg)
 ![GutHub Languages](https://img.shields.io/github/languages/count/qubus-ai/qubus.svg?style=flat)
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/qubus-ai/qubus.svg?style=flat)
 ![GitHub Code Size](https://img.shields.io/github/languages/code-size/qubus-ai/qubus.svg?style=flat)
