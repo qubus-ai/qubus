@@ -22,8 +22,7 @@ export class AppComponent implements OnInit, AfterViewInit {
               private dialog: MatDialog,
               private settingsService: SettingsService,
               private electronService: ElectronService,
-              private taskService: TaskService, 
-              private toastService: ToastService) {
+              private taskService: TaskService) {
 
   }
 

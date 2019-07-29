@@ -30,9 +30,7 @@ export class ActiveProjectService {
   }
 
   open(project: Project): Observable<boolean> {
-
     this.close();
-    
     this.project = project;
     
     return this.imageService.getAll(this.project.path).pipe(map(images => {
@@ -80,7 +78,7 @@ export class ActiveProjectService {
 
   selectNext(key?: string, value?: any) {
     this.activeImageIndex++;
-    if (this.activeImageIndex >= this.images.length) {
+    if(this.activeImageIndex >= this.images.length) {
       this.activeImageIndex = 0;
     }
     let data = { image: this.images[this.activeImageIndex] };

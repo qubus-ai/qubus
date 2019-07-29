@@ -35,7 +35,6 @@ export class MapLayerService {
               private ipcRequest: IpcRequest) {
 
     this.mapLayerFile = join(this.electronService.remote.app.getPath('userData'), 'mapLayers.json');
-
     let response = this.ipcRequest.sendIpcRequestSync<string, string>(IpcChannel.READ_FILE_SYNC, this.mapLayerFile);
 
     if (response.error) {
@@ -62,7 +61,6 @@ export class MapLayerService {
     if (index == -1) {
       return of(false);
     }
-
     this.mapLayers.push(layer);
 
     return from(this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.mapLayerFile, JSON.stringify(this.mapLayers)))

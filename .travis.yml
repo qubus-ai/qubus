@@ -8,18 +8,25 @@ cache:
   directories:
   - "$HOME/.npm"
 os:
-  - linux
-  - osx
+- linux
+- osx
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run packager-mac ;fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run packager-linux ;fi
+- echo $TRAVIS_OS_NAME
+- echo $TRAVIS_BRANCH
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
+  npm run build-release ;fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
+  npm run build-release ;fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == $TRAVIS_TAG ]]; then
+  npm run packager-linux ;fi
+- export RELEASE_DEPLOY=$PWD/$(ls release-builds/*.tar.gz)
 deploy:
   provider: releases
   api_key:
-    secure: "saQECc8bGFPYXdrd6QOzpjHzmgnHg/9x5gyzwVbuie0KMeS8eTl5V13dtbGnAUoOwtoNRG7jXLs4N4BYAhCwbCvyty1ln7AGw+XAt7kzzecIzuhb2PsV8LWd8ohvx4qW2mSZSjuCS6S5hm5+UKwv+oZzv03taTgFPRqkwjfjTkkS/5J4JB9s5qosDX4OptUZ0VHO6uX4TSHKaqZXfJPP6VZbJSlcImY3moBimnl+uLEbPp99fnmdMOfbPlp49Wp7NEYlYKrGNcVzi1zzyKzU6kEV0pEK041Me60fvNWNSJzxBqiNHBLE1OmZyd3re2HZdqcanGcHWB8Dyy82G1CYwZ5mZgJKbthCXHHhQAK9QlmdbLpds/998Q0XEYAcp22zyK16Mv9vPredRLVDTbxqZDXxg0gWsL78oQntUfhp3sweqfJkBA4oiXHOu9ysibizPcfUn1IUIYxjx5efIjbHlb1b631vo6WBUKQ3fb7MoXy8B8nqifcDLFBkEuSsSC8+bvCiljAEF34MjXesAQG3MiSewqTvRazr3mlDdWevw580pJDneqyqjNwtZPyGublrKRYiTvQuLGz6qXyiULVXgk/IXlqvrUxFO3xcld9qP9VTekEuRxn8q/5qGBqmR45GgGS8HOYBzho22iIpBIcpry0ieGZx037Dh8vyqshErHw="
-  file: 
-    - ./release-builds/qubus-linux-x64.tar.gz
+    secure: pjF0+7imlWPtv5420QBWWBA3vZmcx/D3f1jH+cDVWCvlXXMYdlEcArScGpOAShqoouR3h7B4OyxNaATogjojpgDolJKG/tkhSWTilOAM5jK3sIQVCQBcINsPiIZ8Vjpgq677zKJz4is8i5nJLC8zX/fa/lbMZ54aBxEyjx81L5Wx+QVAXqzHmHaV1VceTXaaa/1ww9pfjofGwePqHc1BzwQpi7GD0FaaFAbCnenuFY4EVmTXHI3srjuHIGrVvRXv75sX2rML9qEy3jE7+Rdi355iZa3ZO/4025Mbk3HeuPB81vIT5dd6/HLq/ArlVduy3RqtiSx4njbbRwIhGgiQb3/vIuAaMkK0ZF7tyyPNnYjZX+POKy5OFHz2uO/jXZqqhYLwZrH5q8QMfLCh/ziWi2DhM7XPBTQWOee4VsFgzNsFNYK/wYrrW8QRLJC9SP6x5NmRLKo16EamJYbGHGGCGEWgYhDE5cFw5rqIcLeZHZTbUYzjF43EAJwxLLmDOWK3a1iNTmUwYu9UVExMwj/PfN1VHNL/CD5Tfz+zGEUuF44p4vMnP5SGsn5l1gK7RPZBaoh9Lj/PB8tTVt4uuwEpzGcaEeEOCUzqNiQ09X9IbqTF0ZVUyiicEYt4qTz3epI20nqVcKCL557bLfkM3DegtVjZ1M6E5twsrHd6LXEoEE4=
+  file: "${RELEASE_DEPLOY}"
   skip_cleanup: true
+  overwrite: true
   on:
-    repo: https://github.com/qubus-ai/qubus
+    repo: qubus-ai/qubus
     tags: true
