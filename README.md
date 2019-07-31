@@ -11,7 +11,7 @@
 </p>
 
 <p align="center" >
-  cross platform geo-tagged image wiewer
+  cross platform geo-tagged image viewer
 </p>
  
 ## [About](http://qubus.netlify.com)
