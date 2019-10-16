@@ -3,7 +3,7 @@
   <div mat-dialog-content>
     <mat-form-field>
       <input type="text" matInput placeholder="Browse" formControlName="path" (click)="selectPath()">
-      <button mat-button mat-icon-button matSuffix (click)="selectPath()" [disabled]="getPathState()">
+      <button mat-button mat-icon-button matSuffix type="button" (click)="selectPath()" [disabled]="getPathState()">
         <mat-icon>more_horiz</mat-icon>
       </button>
       <mat-error *ngIf="path.hasError('required')">
