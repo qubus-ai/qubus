@@ -10,16 +10,19 @@ cache:
 os:
 - linux
 - osx
+- windows
+
 script:
 - echo $TRAVIS_OS_NAME
 - echo $TRAVIS_BRANCH
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
-  npm run build-release ;fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
-  npm run build-release ;fi
+- npm run build-release
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_BRANCH" == $TRAVIS_TAG ]]; then
-  npm run packager-linux ;fi
-- export RELEASE_DEPLOY=$PWD/$(ls release-builds/*.tar.gz)
+  npm run packager-linux; export RELEASE_DEPLOY=$PWD/release-builds/qubus-linux-x64.tar.gz; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$TRAVIS_BRANCH" == $TRAVIS_TAG ]]; then
+  npm run packager-osx; export RELEASE_DEPLOY=$PWD/release-builds/qubus-darwin-x64.zip; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]] && [[ "$TRAVIS_BRANCH" == $TRAVIS_TAG ]]; then
+  npm run packager-windows; export RELEASE_DEPLOY=$PWD/release-builds/qubus-win32-x64.zip; fi
+
 deploy:
   provider: releases
   api_key:
