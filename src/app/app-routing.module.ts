@@ -6,11 +6,12 @@ import { ImageListComponent } from './image/image-list/image-list.component';
 import { ImageViewComponent } from './image/image-view/image-view.component';
 import { ImageMapViewComponent } from './image/image-map-view/image-map-view.component';
 import { ImageDetailViewComponent } from './image/image-detail-view/image-detail-view.component';
+import { MapComponent } from './maps/map/map.component';
 
 const routes: Routes = [
     {
         path: '',
-        redirectTo: 'projectList',
+        redirectTo: 'map',
         pathMatch: 'full'
     },
     {
@@ -32,6 +33,10 @@ const routes: Routes = [
     {
         path: "imageDetailView",
         component: ImageDetailViewComponent
+    },
+    {
+        path: "map",
+        component: MapComponent
     }
 ];
 

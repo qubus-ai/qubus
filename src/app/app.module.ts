@@ -16,6 +16,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AboutDialogComponent } from './about-dialog/about-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog/settings-dialog.component';
 
+import { MapsModule } from './maps/maps.module';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,7 +34,8 @@ import { SettingsDialogComponent } from './settings-dialog/settings-dialog.compo
     ProjectModule,
     ImageModule,
     ToastModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MapsModule
   ],
   providers: [IpcRequest],
   entryComponents: [ConfirmDialogComponent, AboutDialogComponent, SettingsDialogComponent],
