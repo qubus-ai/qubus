@@ -31,26 +31,16 @@ export class ProjecFormComponent {
         if(data.project)
         {
           this.state = data.state || ProjectFormState.Read;
-          this.submitLabel = "Update";
-          this.formTitle = "Settings of project: " + data.project.name;
-          this.update  = true;
 
           this. projectForm = this.fb.group({
             name: ['', [Validators.required]],
-            path: ['', [Validators.required]],
+            path: ['', [Validators.required, this.validateProjectPath.bind(this)]],
             comment: [''],
-            imageSortType: ['1']
+            imageSortType: [1]
           })
           
           this.projectForm.patchValue(data.project);
-          this.path.disable();
-
-          if(this.state == ProjectFormState.Read)
-          {
-            this.name.disable();
-            this.projectForm.get("comment").disable();
-            this.formTitle = "View of project: " + data.project.name;
-          }
+         
         }
       }
       else
@@ -61,9 +51,24 @@ export class ProjecFormComponent {
           name: ['', [Validators.required]],
           path: ['', [Validators.required, this.validateProjectPath.bind(this)]],
           comment: [''],
-          imageSortType: ['1']
+          imageSortType: [1]
         })
       }  
+      switch(this.state)
+      {
+        case ProjectFormState.Edit:
+          this.submitLabel = "Update";
+          this.formTitle = "Settings of project: " + data.project.name;
+          this.update  = true;
+          this.path.disable();
+          break;
+        case ProjectFormState.Read:
+          this.projectForm.get("comment").disable();
+          this.formTitle = "View of project: " + data.project.name;
+          this.path.disable();
+          this.name.disable();
+      }
+     
   }
 
   get name()

@@ -14,9 +14,8 @@
     border-radius: 4px;
     align-items: center;
     margin: 2px;
-    border: 1px solid;
     box-shadow: 3px 4px 29px -1px rgba(0,0,0,0.75);
-    color: transparent;
+    color: white;
 }
 
 .success {

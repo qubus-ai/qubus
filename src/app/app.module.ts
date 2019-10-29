@@ -23,7 +23,7 @@ import { MapsModule } from './maps/maps.module';
     AppComponent,
     ConfirmDialogComponent,
     AboutDialogComponent,
-    SettingsDialogComponent
+    SettingsDialogComponent,
   ],
   imports: [
     BrowserModule,

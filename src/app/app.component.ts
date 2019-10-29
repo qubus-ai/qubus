@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   home() {
-    this.router.navigateByUrl("/");
+    this.router.navigateByUrl("/projectList");
   }
 
   isEnabled() {
