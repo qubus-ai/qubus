@@ -18,6 +18,9 @@ import { ImageSize, ImageHorizontalPlacement, ImageVerticalPlacement } from '../
 import { SettingsService } from 'src/app/settings.service';
 import { TaskService } from 'src/app/project/task.service';
 import { Point as PointGeojson, Feature as FeatureGeojson, FeatureCollection } from 'geojson';
+import { ActivatedRoute } from '@angular/router';
+import { Project } from 'src/app/project/model/project';
+import { ProjectService } from 'src/app/project/project.service';
 
 interface previewInterface {
   image: Image;
@@ -56,16 +59,22 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
 
   tileLayer = new Tile({ source: new OSM.default({ url: "" }) });
 
+  project: Project;
+
   constructor(private imageService: ImageService,
               private activeProjectService: ActiveProjectService,
               private settingsService: SettingsService,
-              private taskService: TaskService) {
+              private taskService: TaskService,
+              private route: ActivatedRoute,
+              private projectService: ProjectService) {
     this.previewSubject = new Subject<previewInterface>();
     this.activeImageFeature = new Feature({ geometry: new Point([0, 0])});
   }
 
-  ngOnInit() {
-    let task = this.taskService.getTask(this.activeProjectService.project);
+  async ngOnInit() {
+    let index = Number(this.route.snapshot.paramMap.get('id'));
+    this.project = await this.projectService.getByIndex(index);
+    let task = this.taskService.getTaskByName(this.project.path);
     if (task) {
       this.taskStreamSubscription = task.stream.subscribe(data => {
         if (!data) return;
@@ -83,7 +92,7 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
     });
 
     this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
-      if (!data.image) return;
+      if (!data || !data.image) return;
 
       this.previewImage = null;
       this.image = data.image;
@@ -123,7 +132,7 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
     this.setActiveImageLayer();
     this.setMapInteraction();
 
-    this.map.getView().fit(this.imageSource.getExtent());
+   
   }
 
   ngOnDestroy(): void {
@@ -143,9 +152,10 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
     this.tileLayer.setSource(new OSM.default({ url: url }));
   }
 
-  private setImageLayer(): void
+  private async setImageLayer()
   {
-    let filteredFeatures = this.activeProjectService.featureCollection.features.filter((item) => {
+    let features = await this.imageService.getFeatureCollection(this.project.path).toPromise();
+    let filteredFeatures = features.features.filter((item) => {
       let point = item.geometry as PointGeojson;
       if (point.coordinates[0] != 0 && point.coordinates[1] != 0) {
         return true;
@@ -164,6 +174,7 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
     });
 
     this.map.addLayer(imageLayer);
+    this.map.getView().fit(this.imageSource.getExtent());
   }
 
   private setActiveImageLayer()
@@ -188,9 +199,9 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
       if (selection.getFeatures().getArray().length > 0) {
         let name = selection.getFeatures().getArray()[0].get('name')
 
-        let img = this.activeProjectService.images.find(item => { return name == item.name });
+        //let img = this.activeProjectService.images.find(item => { return name == item.name });
         let p = [(<any>event).mapBrowserEvent.originalEvent.clientX, (<any>event).mapBrowserEvent.originalEvent.clientY];
-        this.previewSubject.next({ image: img, pixel: p });
+       // this.previewSubject.next({ image: img, pixel: p });
       }
       else {
         this.previewSubject.next(null);
@@ -212,7 +223,7 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
         return feature;
       })
       if (feature) {
-        this.activeProjectService.selectImageByName(feature.get('name'));
+        this.activeProjectService.selectImageByName(this.project.path, feature.get('name'));
       }
     })
 

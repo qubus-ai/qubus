@@ -9,27 +9,31 @@ import { FeatureCollection, Feature, Point } from 'geojson';
 
 export interface ActiveImageInterface {
   image: Image;
+  index: number;
   [key: string]: any
 };
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActiveProjectService {
 
-  project: Project;
-  images: Image[];
-  featureCollection: FeatureCollection;
+  //project: Project;
+  //images: Image[];
+  //featureCollection: FeatureCollection;
 
-  private activeImage: BehaviorSubject<ActiveImageInterface>;
-  private activeImageIndex: number = -1;
+  private activeImageSubject: BehaviorSubject<ActiveImageInterface>;
+  private activeImage: ActiveImageInterface;
+  //private activeImageIndex: number = -1;
 
   constructor(private imageService: ImageService,
     private taskService: TaskService) {
-    this.activeImage = new BehaviorSubject<ActiveImageInterface>(null);
+    this.activeImageSubject = new BehaviorSubject<ActiveImageInterface>(null);
+    this.activeImage = null;
   }
 
-  open(project: Project): Observable<boolean> {
+  /*open(project: Project): Observable<boolean> {
     this.close();
     this.project = project;
     
@@ -50,15 +54,75 @@ export class ActiveProjectService {
       }
       return true;
     }));
-  }
+  }*/
 
   close() {
-    this.project = null;
-    this.images = null;
-    this.activeImageIndex = -1;
+    //this.project = null;
+    //this.images = null;
+    //this.activeImageIndex = -1;
     this.activeImage.next(null);
   }
 
+  /*selectImageByName(name: string, key?: string, value?: any) {
+    let index = this.images.findIndex(item => { return item.name == name });
+    this.selectImageByIndex(index, key, value);
+  }*/
+
+  private setActiveImage(activeImage: ActiveImageInterface)
+  {
+    this.activeImage = activeImage;
+    this.activeImageSubject.next(activeImage);
+  }
+
+
+  async selectImage(image: Image, attribute?: [string, any]) {
+    let images = await this.imageService.getImages(image.path).toPromise();
+    let index = images.findIndex(item => { return item.name == image.name })
+    let active = { image: image, index: index }
+    if(attribute){
+      active[attribute[0]] = attribute[1];
+    }
+    this.setActiveImage(active);
+  }
+
+  async selectImageByName(projectName: string, imageName:string, attribute?: [string, any])
+  {
+    let images = await this.imageService.getImages(projectName).toPromise();
+    let index = images.findIndex(item => { return item.name == imageName })
+    let active = { image: images[index], index: index }
+    if(attribute){
+      active[attribute[0]] = attribute[1];
+    }
+    this.setActiveImage(active);
+  }
+
+  async selectImageByIndex(projectName:string, index: number, attribute?: [string, any]) {
+    let images = await this.imageService.getImages(projectName).toPromise();
+    let active = { image: images[index], index: index };
+    if(attribute){
+      active[attribute[0]] = attribute[1];
+    }
+    this.setActiveImage(active);
+  }
+
+  async selectNext(projectName: string, attribute?: [string, any]) {
+    let images = await this.imageService.getImages(projectName).toPromise();
+    let index = this.activeImage.index + 1;
+    if(index >= images.length) {
+      index = 0;
+    }
+    this.selectImageByIndex(projectName, index, attribute);
+  }
+
+  async selectPrevious(projectName: string, attribute?: [string, any]) {
+    let images = await this.imageService.getImages(projectName).toPromise();
+    let index = this.activeImage.index - 1;
+    if (index < 0) {
+      index = images.length - 1;
+    }
+    this.selectImageByIndex(projectName, index, attribute);
+  }
+/*
   selectImageByName(name: string, key?: string, value?: any) {
     let index = this.images.findIndex(item => { return item.name == name });
     this.selectImageByIndex(index, key, value);
@@ -95,12 +159,12 @@ export class ActiveProjectService {
     data[key] = value;
     this.activeImage.next(data);
   }
-
+*/
   getActiveImage(): Observable<ActiveImageInterface> {
-    return this.activeImage.asObservable();
+    return this.activeImageSubject.asObservable();
   }
 
-  private sortImage(imageSortType: ImageSortType):void
+  /*private sortImage(imageSortType: ImageSortType):void
   {
     switch (+imageSortType) {
       case ImageSortType.DATE:
@@ -136,9 +200,9 @@ export class ActiveProjectService {
       let point = feature.geometry as Point;
       image.position = point.coordinates;
     }
-  }
+  }*/
 
-  private selectDefaultImage():void {
+  /*private selectDefaultImage():void {
     let feature = this.featureCollection.features.find(f => {
       let point = f.geometry as Point;
       if (point.coordinates[0] != 0 && point.coordinates[1] != 0) {
@@ -150,5 +214,5 @@ export class ActiveProjectService {
     if (feature) {
       this.selectImageByName(feature.properties.name);
     }
-  }
+  }*/
 }

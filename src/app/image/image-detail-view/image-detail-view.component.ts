@@ -10,6 +10,9 @@ import { Style, Stroke } from 'ol/style';
 import { LineString } from 'ol/geom';
 import { getCenter } from 'ol/extent';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { Project } from 'src/app/project/model/project';
+import { ProjectService } from 'src/app/project/project.service';
 
 
 @Component({
@@ -27,10 +30,15 @@ export class ImageDetailViewComponent implements OnInit, OnDestroy {
 
   activeImageSubscription: Subscription;
 
-  constructor(private activeProjectService: ActiveProjectService) { }
+  project: Project;
 
-  ngOnInit() {
-    
+  constructor(private activeProjectService: ActiveProjectService,
+              private projectService: ProjectService,
+              private route: ActivatedRoute) {}
+
+  async ngOnInit() {
+    let index = Number(this.route.snapshot.paramMap.get('id'));
+    this.project = await this.projectService.getByIndex(index);
     this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
       this.image = data.image;
       let img = new Image();
@@ -87,12 +95,12 @@ export class ImageDetailViewComponent implements OnInit, OnDestroy {
 
   next()
   {
-    this.activeProjectService.selectNext();
+    this.activeProjectService.selectNext(this.project.path);
   }
 
   previous()
   {
-    this.activeProjectService.selectPrevious();
+    this.activeProjectService.selectPrevious(this.project.path);
   }
 
   rotate()

@@ -57,6 +57,7 @@ export class ImageViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
+      if(!data || !data.image) return;
       this.image = data.image;
     });
   }

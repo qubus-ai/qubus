@@ -26,7 +26,7 @@ export class ProjectListComponent implements OnInit {
               private taskService: TaskService,
               private activeProjectService: ActiveProjectService,
               private router: Router) {
-    projectService.getAll().subscribe(projects => {
+    projectService.get().subscribe(projects => {
       this.projects = projects
     });
   }
@@ -79,19 +79,22 @@ export class ProjectListComponent implements OnInit {
   }
 
   openProjectGrid(index: number) {
-    this.openProject(index, "/imageGrid");
+    this.router.navigateByUrl("/imageGrid/" + index);
+    
+    //this.openProject(index, "/imageGrid");
   }
 
   openProjectMap(index: number) {
-    this.openProject(index, "/imageMapView");
+    this.router.navigateByUrl("/imageMapView/" + index);
+    //this.openProject(index, "/imageMapView");
   }
 
   openProject(index: number, destination: string) {
-    this.activeProjectService.open(this.projects[index]).subscribe(result => {
+    /*this.activeProjectService.open(this.projects[index]).subscribe(result => {
       this.router.navigateByUrl(destination);
     }, error => {
       this.toastService.danger("Project cannot be opened");
-    })
+    })*/
   }
 
   deleteProject(index: number) {

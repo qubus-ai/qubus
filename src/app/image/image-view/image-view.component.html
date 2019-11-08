@@ -1,6 +1,6 @@
 <!-- <div class="blur" [style.background-image]="getUrl(image)" (click)="ccc($event)">
 </div>  -->
-<div class="container">
+<div *ngIf="image" class="container">
     <div>
         <button mat-mini-fab color="primary" class="preview-button" (click)="togglePreview()">List</button>
     </div>

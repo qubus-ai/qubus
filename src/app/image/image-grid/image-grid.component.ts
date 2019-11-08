@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, ViewContainerRef, OnDestroy } from '@angular/core';
 import { Image } from '../model/image';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { fromEvent, Subscription } from 'rxjs';
 import { debounceTime, filter, take } from 'rxjs/operators';
 import { ToastService } from '../../toast/toast.service';
@@ -10,6 +10,8 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ActiveProjectService } from 'src/app/active-project.service';
 import { ImageService } from '../image.service';
+import { ProjectService } from 'src/app/project/project.service';
+import { Project } from 'src/app/project/model/project';
 
 @Component({
   selector: 'app-image-grid',
@@ -34,16 +36,24 @@ export class ImageGridComponent implements OnInit, OnDestroy {
 
   resizeSubscription: Subscription;
 
+  project: Project;
+
   constructor(private activeProjectService: ActiveProjectService,
               private imageService: ImageService,
               private router: Router,
               private toastService: ToastService,
               public dialog: MatDialog,
               public overlay: Overlay,
-              public viewContainerRef: ViewContainerRef) { }
+              public viewContainerRef: ViewContainerRef,
+              private route: ActivatedRoute,
+              private projectService: ProjectService) {
+                
+               }
   
-  ngOnInit() {
-    this.images = this.activeProjectService.images;
+  async ngOnInit() {
+    let index = Number(this.route.snapshot.paramMap.get('id'));
+    this.project = await this.projectService.getByIndex(index);
+    this.images = await this.imageService.getImages(this.project.path).toPromise();
     this.arrangeImages();
     this.resizeSubscription = fromEvent(window, 'resize').pipe(debounceTime(500)).subscribe((event) => {
       this.arrangeImages();

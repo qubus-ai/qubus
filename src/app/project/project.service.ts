@@ -15,7 +15,7 @@ import { TaskService } from './task.service';
 export class ProjectService {
 
   projectFile: string;
-  projects: Array<Project> = [];
+  projects: Array<Project> = null;
 
   constructor(private electronService: ElectronService,
               private ipcRequest: IpcRequest,
@@ -25,7 +25,7 @@ export class ProjectService {
     this.projectFile = join(this.electronService.remote.app.getPath('userData'), 'projects.json');
   }
 
-  getAll(): Observable<Project[]> {
+  get(): Observable<Project[]> {
     return from(this.ipcRequest.sendIpcRequest<string, string>(IpcChannel.READ_FILE, this.projectFile)).pipe(map(response => {
       let data = JSON.parse(response);
       return this.projects = data.map(d => {
@@ -36,7 +36,11 @@ export class ProjectService {
     }))
   }
 
-  get(index: number): Project {
+  async getByIndex(index: number){
+    if(!this.projects || !this.projects[index])
+    {
+      this.projects = await this.get().toPromise();
+    }
     return this.projects[index];
   }
 

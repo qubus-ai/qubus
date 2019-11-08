@@ -11,6 +11,8 @@ import { ProjecFormComponent } from 'src/app/project/projec-form/projec-form.com
 import { ProjectService } from 'src/app/project/project.service';
 import { ToastService } from 'src/app/toast/toast.service';
 
+import { Mapy } from '../../image/map';
+
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -18,39 +20,21 @@ import { ToastService } from 'src/app/toast/toast.service';
 })
 export class MapComponent implements OnInit {
 
-  map: Map;
-  tileLayer = new Tile({ source: new OSM.default({ url: "" }) });
-
-  settingsSubscription: Subscription;
+  private mapy: Mapy;
   
   constructor(private projectService: ProjectService,
               public dialog: MatDialog,
               private toastService: ToastService,
-              private settingsService: SettingsService) { }
+              private settingsService: SettingsService) { 
+                this.mapy = new Mapy();
+              }
 
   ngOnInit() {
-
-    this.settingsSubscription = this.settingsService.settingsChanged().subscribe(setting => {
-      this.setTileLayerSource();
-    });
-
-    this.map = new Map({
-      target: 'map',
-      layers: [this.tileLayer],
-      view: new View({
-        center: [60, 60],
-        zoom: 6
-      })
-    })
-
-    this.setTileLayerSource();
+  
+    this.mapy.initialize('map');
   }
 
-  private setTileLayerSource(): void
-  {
-    let url = this.settingsService.settings.map || "http://stamen-tiles-c.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png";
-    this.tileLayer.setSource(new OSM.default({ url: url }));
-  }
+  
 
   onFileDrop(file: any)
   {

@@ -19,19 +19,19 @@ const routes: Routes = [
         component: ProjectListComponent
     },
     {
-        path: "imageGrid",
+        path: "imageGrid/:id",
         component: ImageGridComponent
     },
     {
-        path: "imageView",
+        path: "imageView/:id",
         component: ImageViewComponent
     },
     {
-        path: "imageMapView",
+        path: "imageMapView/:id",
         component: ImageMapViewComponent
     },
     {
-        path: "imageDetailView",
+        path: "imageDetailView/:id",
         component: ImageDetailViewComponent
     },
     {
