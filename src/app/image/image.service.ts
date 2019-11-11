@@ -8,9 +8,6 @@ import { ExifData } from 'exif';
 import { FeatureCollection, Feature, Point } from 'geojson';
 import { TaskService } from '../project/task.service';
 
-
-
-
 class Cache<T, D> {
 
   data: T;
@@ -144,6 +141,13 @@ export class ImageService {
       this.updateImage(filename);
       return images;
     }))
+  }
+
+  async getImage(filename: string, imageName: string)
+  {
+    let images = await this.getImages(filename).toPromise();
+
+    return images.find(item => { return item.name == imageName});
   }
 
   getExif(image: Image): Observable<ExifData> {

@@ -4,10 +4,11 @@ import * as OSM from 'ol/source/OSM';
 import { Point as PointGeojson, Feature as FeatureGeojson, FeatureCollection } from 'geojson';
 import * as VectorSource from 'ol/source/Vector';
 import { GeoJSON } from 'ol/format';
-import { map } from 'rxjs/operators';
 import BaseLayer from 'ol/layer/Base';
 import { Point } from 'ol/geom';
 import { transform } from 'ol/proj';
+import { Select } from 'ol/interaction';
+import { pointerMove } from 'ol/events/condition';
 
 export class Mapy
 {
@@ -15,6 +16,8 @@ export class Mapy
     view: View = new View({ center: [0, 0], zoom: 1 });
     tileLayer = new Tile({ source: new OSM.default({ url: "http://stamen-tiles-c.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png" }) });
    
+    isClicking: boolean = false;
+    singleClickTimeout: any;
 
     constructor()
     {
@@ -52,7 +55,8 @@ export class Mapy
         let layer = <Vector>this.getLayer(name);
         if(!layer)
         {   
-            layer = new Vector();
+            let source = new VectorSource.default();
+            layer = new Vector({source: source});
             layer.set('name', name);
             this.map.addLayer(layer);
         }
@@ -92,4 +96,42 @@ export class Mapy
       
           this.map.addLayer(imageLayer);*/
     }
+
+    private setMapInteraction(): void
+  {
+    let selection = new Select({ condition: pointerMove });
+    
+    selection.on('select', (event) => {
+      if (selection.getFeatures().getArray().length > 0) {
+        let name = selection.getFeatures().getArray()[0].get('name')
+
+        //let img = this.activeProjectService.images.find(item => { return name == item.name });
+        let p = [(<any>event).mapBrowserEvent.originalEvent.clientX, (<any>event).mapBrowserEvent.originalEvent.clientY];
+       // this.previewSubject.next({ image: img, pixel: p });
+      }
+      else {
+        //this.previewSubject.next(null);
+      }
+    })
+
+    this.map.addInteraction(selection);
+
+    this.map.on('singleclick', event => {
+      this.isClicking = true;
+      if (this.singleClickTimeout) {
+        clearTimeout(this.singleClickTimeout);
+      }
+      this.singleClickTimeout = setTimeout(() => {
+        this.isClicking = false;
+      }, 2000);
+
+      let feature = this.map.forEachFeatureAtPixel((<any>event).pixel, (feature, layer) => {
+        return feature;
+      })
+      if (feature) {
+       // this.activeProjectService.selectImageByName(feature.get('path'), feature.get('name'));
+      }
+    })
+
+  }
 }

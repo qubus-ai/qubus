@@ -195,13 +195,14 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
   {
     let selection = new Select({ condition: pointerMove });
     
-    selection.on('select', (event) => {
+    selection.on('select', async(event) => {
       if (selection.getFeatures().getArray().length > 0) {
         let name = selection.getFeatures().getArray()[0].get('name')
-
-        //let img = this.activeProjectService.images.find(item => { return name == item.name });
+        let proj = selection.getFeatures().getArray()[0].get('path')
+        console.log("======", name, proj);
+        let img =  await this.imageService.getImage(proj, name);
         let p = [(<any>event).mapBrowserEvent.originalEvent.clientX, (<any>event).mapBrowserEvent.originalEvent.clientY];
-       // this.previewSubject.next({ image: img, pixel: p });
+        this.previewSubject.next({ image: img, pixel: p });
       }
       else {
         this.previewSubject.next(null);
@@ -223,7 +224,7 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
         return feature;
       })
       if (feature) {
-        this.activeProjectService.selectImageByName(this.project.path, feature.get('name'));
+        this.activeProjectService.selectImageByName(feature.get('path'), feature.get('name'));
       }
     })
 

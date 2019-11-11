@@ -12,6 +12,7 @@ import { ProjectService } from 'src/app/project/project.service';
 import { ToastService } from 'src/app/toast/toast.service';
 
 import { Mapy } from '../../image/map';
+import { ImageService } from 'src/app/image/image.service';
 
 @Component({
   selector: 'app-map',
@@ -25,13 +26,22 @@ export class MapComponent implements OnInit {
   constructor(private projectService: ProjectService,
               public dialog: MatDialog,
               private toastService: ToastService,
+              private imageService: ImageService,
               private settingsService: SettingsService) { 
                 this.mapy = new Mapy();
               }
 
-  ngOnInit() {
+  async ngOnInit() {
   
     this.mapy.initialize('map');
+
+    let projects = await this.projectService.get().toPromise();
+
+    projects.forEach(project => {
+      this.imageService.getFeatureCollection(project.path).subscribe(features =>{
+        this.mapy.addFeatureCollection(project.path, features);
+      })
+    })
   }
 
   
