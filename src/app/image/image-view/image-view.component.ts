@@ -3,6 +3,8 @@ import { Image } from '../model/image';
 import { ActiveProjectService } from '../../active-project.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { Project } from 'src/app/project/model/project';
+import { ProjectService } from 'src/app/project/project.service';
 
 export enum ImageVerticalPlacement {
   TOP = 0,
@@ -34,6 +36,8 @@ export class ImageViewComponent implements OnInit, OnDestroy {
 
   image: Image;
 
+  project: Project;
+
   previewVisible: boolean = true;
 
   previewWidth: number = 220;
@@ -52,12 +56,14 @@ export class ImageViewComponent implements OnInit, OnDestroy {
   activeImageSubscription: Subscription;
   previewToggleTimeout: any;
 
-  constructor(private activeProjectService: ActiveProjectService, 
+  constructor(private activeProjectService: ActiveProjectService,
+              private projectService: ProjectService, 
               private router: Router) { }
 
   ngOnInit() {
-    this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
+    this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(async data => {
       if(!data || !data.image) return;
+      this.project = await this.projectService.getByPath(data.image.path);
       this.image = data.image;
     });
   }

@@ -10,7 +10,7 @@ import * as VectorSource from 'ol/source/Vector';
 import * as OSM from 'ol/source/OSM';
 import { Style, Stroke, Circle } from 'ol/style';
 import { Point } from 'ol/geom';
-import { Image } from '../model/image';
+import { Image, imageFromOlFeature } from '../model/image';
 import { ImageService } from '../image.service';
 import { Subscription, Subject, timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
@@ -197,14 +197,16 @@ export class ImageMapViewComponent implements OnInit, OnDestroy {
     
     selection.on('select', async(event) => {
       if (selection.getFeatures().getArray().length > 0) {
-        let name = selection.getFeatures().getArray()[0].get('name')
-        let proj = selection.getFeatures().getArray()[0].get('path')
+        let name = selection.getFeatures().getArray()[0].get('name');
+        let proj = selection.getFeatures().getArray()[0].get('path');
         console.log("======", name, proj);
-        let img =  await this.imageService.getImage(proj, name);
+        //let img =  await this.imageService.getImage(proj, name);
+        let img = imageFromOlFeature(selection.getFeatures().getArray()[0]);
         let p = [(<any>event).mapBrowserEvent.originalEvent.clientX, (<any>event).mapBrowserEvent.originalEvent.clientY];
         this.previewSubject.next({ image: img, pixel: p });
       }
       else {
+        console.log("==== no future");
         this.previewSubject.next(null);
       }
     })

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit, Input } from '@angular/core';
 import { ActiveProjectService } from '../../active-project.service';
 import { Image } from '../model/image';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -35,7 +35,7 @@ export class ImageListComponent implements OnInit, OnDestroy, AfterViewInit {
   contexMenuSubscription: Subscription;
   activeImageSubscription: Subscription;
 
-  project: Project;
+  @Input() project: Project;
 
   constructor(private activeProjectService: ActiveProjectService,
               private router: Router,
@@ -47,13 +47,14 @@ export class ImageListComponent implements OnInit, OnDestroy, AfterViewInit {
               private projectService: ProjectService,
               private route: ActivatedRoute) {}
 
-  async ngOnInit() {
-    let index = Number(this.route.snapshot.paramMap.get('id'));
-    this.project = await this.projectService.getByIndex(index);
-    this.images = await this.imageService.getImages(this.project.path).toPromise();
+  ngOnInit() {
+    //let index = Number(this.route.snapshot.paramMap.get('id'));
+    //this.project = await this.projectService.getByIndex(index);
+    
   }
 
-  ngAfterViewInit(): void {
+  async ngAfterViewInit() {
+    this.images = await this.imageService.getImages(this.project.path).toPromise();
     this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
       if(!data.image) return;
       let index = this.images.findIndex(item => { return item.name == data.image.name});

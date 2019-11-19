@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Image } from './model/image';
+import { Image, imageFromFeature } from './model/image';
 import { IpcRequest } from '../ipc-request';
 import { IpcChannel } from 'backend/commons';
 import { Observable, from, of, ReplaySubject } from 'rxjs';
@@ -44,10 +44,8 @@ export class ImageService {
     return from(this.ipcRequest.sendIpcRequest<string, string>(IpcChannel.READ_FILE, filename + '/images.json')).pipe(map(response => {
       let data = JSON.parse(response);
       this.geoJson = data;
-      return this.images = data.features.map(img => {
-        let image = new Image(img.properties);
-        image.position = img.geometry.coordinates;
-        return image;
+      return this.images = data.features.map(feature => {
+        return imageFromFeature(feature.properties);
       })
     }))
   }

@@ -3,11 +3,12 @@ import { ElectronService } from 'ngx-electron';
 import { IpcRequest } from '../ipc-request';
 import { IpcChannel } from 'backend/commons';
 import { Project } from './model/project';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from, of, ReplaySubject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators'
 import { SettingsService } from '../settings.service';
 import { join } from '../commons/path-utils';
 import { TaskService } from './task.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,8 @@ export class ProjectService {
 
   projectFile: string;
   projects: Array<Project> = null;
+
+  updateStream: ReplaySubject<Project> = new ReplaySubject();
 
   constructor(private electronService: ElectronService,
               private ipcRequest: IpcRequest,
@@ -42,6 +45,18 @@ export class ProjectService {
       this.projects = await this.get().toPromise();
     }
     return this.projects[index];
+  }
+
+  async getByPath(path: string)
+  {
+    if(!this.projects)
+    {
+      this.projects = await this.get().toPromise();
+    }
+    let found = this.projects.find(project => {
+      return project.path == path;
+    })
+    return found;
   }
 
   isProjectDuplicated(path: string): boolean {

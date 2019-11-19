@@ -9,6 +9,14 @@ import { Point } from 'ol/geom';
 import { transform } from 'ol/proj';
 import { Select } from 'ol/interaction';
 import { pointerMove } from 'ol/events/condition';
+import { Image, imageFromOlFeature } from './model/image';
+import { Subject } from 'rxjs';
+import { Style, Stroke, Circle } from 'ol/style';
+
+interface IEventImage {
+  image: Image;
+  pixel?: number[];
+}
 
 export class Mapy
 {
@@ -16,8 +24,8 @@ export class Mapy
     view: View = new View({ center: [0, 0], zoom: 1 });
     tileLayer = new Tile({ source: new OSM.default({ url: "http://stamen-tiles-c.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png" }) });
    
-    isClicking: boolean = false;
-    singleClickTimeout: any;
+    onFeatureHover = new Subject<IEventImage>();
+    onFeatureClick = new Subject<IEventImage>();
 
     constructor()
     {
@@ -30,7 +38,8 @@ export class Mapy
             target: id,
             layers: [this.tileLayer],
             view: this.view
-          })
+          });
+          this.setMapInteraction();
     }
 
     addFeature(layerName: string, featureGeojson: FeatureGeojson)
@@ -84,6 +93,34 @@ export class Mapy
         this.map.removeLayer(found);
     }
 
+    setActiveFeature(coordinates: number[])
+    {
+      let layer = this.createVectorLayer('ActiveImage');
+     
+      layer.setStyle(new Style({
+        image: new Circle({
+          radius: 6, fill: null, stroke: new Stroke({ color: [255, 0, 0, 0.4], width: 4 })
+        })
+      }))
+
+      let source = layer.getSource();
+      let feature = source.getFeatures()[0];
+      if(!feature)
+      {
+        feature = new Feature();
+        feature.setGeometry(new Point(transform([coordinates[0], coordinates[1]], 'EPSG:4326', "EPSG:3857")));
+        //feature.setGeometry(new Point(coordinates));
+        source.addFeature(feature);
+      }
+      else
+      {
+        let point = <Point>feature.getGeometry();
+        point.setCoordinates((transform([coordinates[0], coordinates[1]], 'EPSG:4326', "EPSG:3857")));
+        //point.setCoordinates(coordinates);
+      }
+
+    }
+
     addImageLayer(featureCollection: FeatureCollection)
     {
       /*  this.imageSource = new VectorSource.default({
@@ -103,33 +140,24 @@ export class Mapy
     
     selection.on('select', (event) => {
       if (selection.getFeatures().getArray().length > 0) {
-        let name = selection.getFeatures().getArray()[0].get('name')
-
-        //let img = this.activeProjectService.images.find(item => { return name == item.name });
-        let p = [(<any>event).mapBrowserEvent.originalEvent.clientX, (<any>event).mapBrowserEvent.originalEvent.clientY];
-       // this.previewSubject.next({ image: img, pixel: p });
+        let image = imageFromOlFeature(selection.getFeatures().getArray()[0]);
+        let pixel = [(<any>event).mapBrowserEvent.originalEvent.clientX, (<any>event).mapBrowserEvent.originalEvent.clientY];
+        this.onFeatureHover.next({image: image, pixel: pixel});
       }
       else {
-        //this.previewSubject.next(null);
+        this.onFeatureHover.next();
       }
     })
 
     this.map.addInteraction(selection);
 
     this.map.on('singleclick', event => {
-      this.isClicking = true;
-      if (this.singleClickTimeout) {
-        clearTimeout(this.singleClickTimeout);
-      }
-      this.singleClickTimeout = setTimeout(() => {
-        this.isClicking = false;
-      }, 2000);
-
       let feature = this.map.forEachFeatureAtPixel((<any>event).pixel, (feature, layer) => {
         return feature;
       })
       if (feature) {
-       // this.activeProjectService.selectImageByName(feature.get('path'), feature.get('name'));
+        let image = imageFromOlFeature(<Feature>feature);
+        this.onFeatureClick.next({image: image});
       }
     })
 

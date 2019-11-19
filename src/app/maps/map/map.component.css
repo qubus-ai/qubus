@@ -4,3 +4,42 @@
     height: calc(100vh - 1px);
     position: relative;
 }
+
+.image-view
+{
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    pointer-events: none;
+}
+
+.image-preview
+{
+    position: absolute;
+  
+}
+
+.image-preview::before
+{
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid white;
+    border-top: 10px solid transparent;
+    left: -10px;
+    top: 20px;
+} 
+
+.image-preview > img
+{
+    width: 200px;
+    height: auto;
+    border-radius: 4px;
+    background-color: white;
+    padding: 2px;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+}
