@@ -34,7 +34,15 @@ export function listImages (path: string) {
                         dateString = exif.exif.DateTimeOriginal;
                         
                         let latitude = exif.gps.GPSLatitude[0] + exif.gps.GPSLatitude[1] / 60 + exif.gps.GPSLatitude[2] / 3600;
-                        let longitude = exif.gps.GPSLongitude[0] + exif.gps.GPSLongitude[1] / 60 + exif.gps.GPSLongitude[2] / 3600
+                        if(exif.gps.GPSLatitudeRef != "E")
+                        {
+                            latitude *= -1.0;
+                        }
+                        let longitude = exif.gps.GPSLongitude[0] + exif.gps.GPSLongitude[1] / 60 + exif.gps.GPSLongitude[2] / 3600;
+                        if(exif.gps.GPSLongitudeRef != "N")
+                        {
+                            longitude *= -1.0;
+                        }
                         point.coordinates = [longitude, latitude];
                     }
                     catch (error) {
@@ -93,7 +101,15 @@ export function dynamicInitialization (event: Electron.Event, ipcChannel: IpcCha
                     dateString = exif.exif.DateTimeOriginal;
                     
                     let latitude = exif.gps.GPSLatitude[0] + exif.gps.GPSLatitude[1] / 60 + exif.gps.GPSLatitude[2] / 3600;
-                    let longitude = exif.gps.GPSLongitude[0] + exif.gps.GPSLongitude[1] / 60 + exif.gps.GPSLongitude[2] / 3600
+                    if(exif.gps.GPSLatitudeRef != "E")
+                    {
+                        latitude *= -1.0;
+                    }
+                    let longitude = exif.gps.GPSLongitude[0] + exif.gps.GPSLongitude[1] / 60 + exif.gps.GPSLongitude[2] / 3600;
+                    if(exif.gps.GPSLongitudeRef != "N")
+                    {
+                        longitude *= -1.0;
+                    }
                     point.coordinates = [longitude, latitude];
                 }
                 catch (error) {
