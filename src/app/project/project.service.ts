@@ -8,60 +8,88 @@ import { map, catchError } from 'rxjs/operators'
 import { SettingsService } from '../settings.service';
 import { join } from '../commons/path-utils';
 import { TaskService } from './task.service';
+import { CrudService } from './model/crud-service';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectService {
+export class ProjectService extends CrudService<Project> {
+  protected onGet(): Observable<Project[]> {
+    return from(this.ipcRequest.sendIpcRequest<string, string>(IpcChannel.READ_FILE, this.projectFile)).pipe(map(response => {
+      let data = JSON.parse(response);
+      return this.items = data.map(d => {
+        return new Project(d);
+      })
+    }), catchError(() => {
+      return of(null);
+    }))
+  }
+  protected onSave(item: Project): Observable<boolean> {
+    this.items.push(item);
+    return from(this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.items)))
+    .pipe(catchError(() => {
+      this.items.pop();
+      return of(false);
+    }))
+  }
+  protected onDelete(item: Project): Observable<boolean> {
+    let index = this.items.findIndex(project => {
+      return project.path == item.path;
+    });
+    this.items.splice(index, 1);
+    return from(this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.items)))
+      .pipe(catchError(() => {
+        this.items.splice(index, 0, item);
+        return of(false);
+      })
+      )
+  }
+  protected onUpdate(item: Project): Observable<boolean> {
+    let index = this.items.findIndex(item => { return item.path == item.path });
+    let oldProject = this.items[index];
+    this.items.splice(index, 1, item);
+
+    return from((this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.items))))
+      .pipe(catchError(() => {
+        this.items.splice(index, 1, oldProject);
+        return of(true);
+      }))
+  }
 
   projectFile: string;
-  projects: Array<Project> = null;
-
-  updateStream: ReplaySubject<Project> = new ReplaySubject();
 
   constructor(private electronService: ElectronService,
               private ipcRequest: IpcRequest,
               private settingsService: SettingsService,
               private taskService: TaskService) {
-
+    super();
     this.projectFile = join(this.electronService.remote.app.getPath('userData'), 'projects.json');
   }
 
-  get(): Observable<Project[]> {
-    return from(this.ipcRequest.sendIpcRequest<string, string>(IpcChannel.READ_FILE, this.projectFile)).pipe(map(response => {
-      let data = JSON.parse(response);
-      return this.projects = data.map(d => {
-        return new Project(d);
-      })
-    }), catchError(() => {
-      return of(this.projects);
-    }))
-  }
 
   async getByIndex(index: number){
-    if(!this.projects || !this.projects[index])
+    if(!this.items || !this.items[index])
     {
-      this.projects = await this.get().toPromise();
+      this.items = await this.get().toPromise();
     }
-    return this.projects[index];
+    return this.items[index];
   }
 
   async getByPath(path: string)
   {
-    if(!this.projects)
+    if(!this.items)
     {
-      this.projects = await this.get().toPromise();
+      this.items = await this.get().toPromise();
     }
-    let found = this.projects.find(project => {
+    let found = this.items.find(project => {
       return project.path == path;
     })
     return found;
   }
-
   isProjectDuplicated(path: string): boolean {
-    if (!this.projects) return false;
-    let found = this.projects.find(item => {
+    if (!this.items) return false;
+    let found = this.items.find(item => {
       return item.path == path;
     });
 
@@ -70,16 +98,7 @@ export class ProjectService {
     return false;
   }
 
-  insert(p: Project): Observable<boolean> {
-    this.projects.push(p);
 
-    return from(this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.projects)))
-      .pipe(catchError(() => {
-        this.projects.pop();
-        return of(false);
-      }))
-
-  }
 
   async initializeProject(project: Project) {
     let started = await this.startProject(project.path).toPromise();
@@ -110,26 +129,4 @@ export class ProjectService {
     return this.update(project);
   }
 
-  remove(index: number): Observable<boolean> {
-    let project = this.projects[index];
-    this.projects.splice(index, 1);
-    return from(this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.projects)))
-      .pipe(catchError(() => {
-        this.projects.splice(index, 0, project);
-        return of(false);
-      })
-      )
-  }
-
-  update(project: Project): Observable<boolean> {
-    let index = this.projects.findIndex(item => { return item.path == project.path });
-    let oldProject = this.projects[index];
-    this.projects.splice(index, 1, project);
-
-    return from((this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.projects))))
-      .pipe(catchError(() => {
-        this.projects.splice(index, 1, oldProject);
-        return of(true);
-      }))
-  }
 }

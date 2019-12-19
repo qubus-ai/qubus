@@ -1,12 +1,13 @@
-import { ReplaySubject, Observable } from "rxjs";
+import { ReplaySubject, Observable, of } from "rxjs";
+import { tap } from 'rxjs/operators';
 
-enum UpdateType {
+export enum UpdateType {
     SAVE = 1,
     DELETE,
     UPDATE
 }
 
-class UpdateDate<T> {
+export class UpdateDate<T> {
     item: T;
     type: UpdateType;
 
@@ -23,43 +24,47 @@ export abstract class CrudService<T> {
 
     updateStream: ReplaySubject<UpdateDate<T>> = new ReplaySubject();
 
-    abstract get(): Observable<T>
-
-    save(item: T)
+    get(): Observable<T[]>
     {
-        this.onSave(item).subscribe(result => {
+        return this.items? of(this.items) : this.onGet();
+    }
+
+    protected abstract onGet(): Observable<T[]>
+
+    save(item: T): Observable<boolean>
+    {
+        return this.onSave(item).pipe(tap(result => {
             if(result)
             {
                 this.updateStream.next(new UpdateDate(item, UpdateType.SAVE));
             }
-        })
+        }));
     }
 
-    abstract onSave(item: T): Observable<boolean>
+    protected abstract onSave(item: T): Observable<boolean>
 
-    delete(item: T)
+    delete(item: T): Observable<boolean>
     {
-        this.onDelete(item).subscribe(result => {
+        return this.onDelete(item).pipe(tap(result => {
             if(result)
             {
                 this.updateStream.next(new UpdateDate(item, UpdateType.DELETE));
             }
-        })
+        }));
     }
 
-    abstract onDelete(item: T): Observable<boolean>
+    protected abstract onDelete(item: T): Observable<boolean>
 
-    update(item: T)
+    update(item: T): Observable<boolean>
     {
-        this.onUpdate(item).subscribe(result => {
+        return this.onUpdate(item).pipe(tap(result => {
             if(result)
             {
                 this.updateStream.next(new UpdateDate(item, UpdateType.UPDATE));
             }
-        })
+        }));
     }
 
-    abstract onUpdate(item: T): Observable<boolean>
-
+    protected abstract onUpdate(item: T): Observable<boolean>
 
 }

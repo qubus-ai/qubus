@@ -9,6 +9,7 @@ import { TaskService } from '../task.service';
 import { ProjectFormState } from '../model/state';
 import { Router } from '@angular/router';
 import { ActiveProjectService } from '../../active-project.service';
+import { UpdateType } from '../model/crud-service';
 
 @Component({
   selector: 'app-project-list',
@@ -29,6 +30,14 @@ export class ProjectListComponent implements OnInit {
     projectService.get().subscribe(projects => {
       this.projects = projects
     });
+
+    this.projectService.updateStream.subscribe(update => {
+      if(update.type == UpdateType.SAVE)
+      {
+        this.toastService.success("Project created successfully!");
+        this.projectService.initializeProject(update.item);
+      }
+    })
   }
 
   ngOnInit() {
@@ -41,10 +50,9 @@ export class ProjectListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(project => {
       if (project) {
-        this.projectService.insert(project).subscribe(response => {
+        this.projectService.save(project).subscribe(response => {
           if (response) {
-            this.toastService.success("Project created successfully!");
-            this.projectService.initializeProject(project);
+           
           }
           else {
             this.toastService.danger("Project creation failed!");
@@ -107,8 +115,7 @@ export class ProjectListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        let name = this.projects[index].name;
-        this.projectService.remove(index).subscribe(response => {
+        this.projectService.delete(this.projects[index]).subscribe(response => {
           response ? this.toastService.success("Project " + name + " removed.") : this.toastService.danger("Project " + name + "is not removed.");
         })
       }

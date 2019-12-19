@@ -17,6 +17,7 @@ import { ImageSize, ImageHorizontalPlacement, ImageVerticalPlacement } from 'src
 import { debounce } from 'rxjs/operators';
 import { Image } from 'src/app/image/model/image';
 import { ActiveProjectService } from 'src/app/active-project.service';
+import { UpdateType } from 'src/app/project/model/crud-service';
 
 @Component({
   selector: 'app-map',
@@ -52,7 +53,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.activeProject.getActiveImage().subscribe(data =>{
       if(!data || !data.image ) return;
-      console.log("----- setActiveFeature");
       this.mapy.setActiveFeature(data.image.position);
     })
 
@@ -85,6 +85,20 @@ export class MapComponent implements OnInit, OnDestroy {
         })
       })
     })
+
+    this.projectService.updateStream.subscribe(async update => {
+      if(update.type == UpdateType.SAVE)
+      {
+        this.projectService.initializeProject(update.item);
+        let a = await this.sleep(5000);
+        let fatures =  await this.imageService.getFeatureCollection(update.item.path).toPromise();
+
+        this.mapy.addFeatureCollection(update.item.path, fatures);
+        this.imageService.getFeatureUpdate(update.item.path).subscribe(feature => {
+          this.mapy.addFeature(update.item.path, feature);
+        })
+      }
+    })
   }
 
   ngOnDestroy(): void {
@@ -108,17 +122,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(project => {
       if (project) {
-        this.projectService.insert(project).subscribe(async response => {
+        this.projectService.save(project).subscribe(async response => {
           if (response) {
             this.toastService.success("Project created successfully!");
-            this.projectService.initializeProject(project);
-            let a = await this.sleep(5000);
-            let fatures =  await this.imageService.getFeatureCollection(project.path).toPromise();
-
-            this.mapy.addFeatureCollection(project.path, fatures);
-            this.imageService.getFeatureUpdate(project.path).subscribe(feature => {
-              this.mapy.addFeature(project.path, feature);
-            })
+            
           }
           else {
             this.toastService.danger("Project creation failed!");
