@@ -15,6 +15,7 @@ import { CrudService } from './model/crud-service';
   providedIn: 'root'
 })
 export class ProjectService extends CrudService<Project> {
+
   protected onGet(): Observable<Project[]> {
     return from(this.ipcRequest.sendIpcRequest<string, string>(IpcChannel.READ_FILE, this.projectFile)).pipe(map(response => {
       let data = JSON.parse(response);
@@ -25,6 +26,7 @@ export class ProjectService extends CrudService<Project> {
       return of(null);
     }))
   }
+
   protected onSave(item: Project): Observable<boolean> {
     this.items.push(item);
     return from(this.ipcRequest.sendIpcRequest<string, boolean>(IpcChannel.WRITE_FILE, this.projectFile, JSON.stringify(this.items)))
@@ -33,6 +35,7 @@ export class ProjectService extends CrudService<Project> {
       return of(false);
     }))
   }
+
   protected onDelete(item: Project): Observable<boolean> {
     let index = this.items.findIndex(project => {
       return project.path == item.path;
@@ -45,6 +48,7 @@ export class ProjectService extends CrudService<Project> {
       })
       )
   }
+
   protected onUpdate(item: Project): Observable<boolean> {
     let index = this.items.findIndex(item => { return item.path == item.path });
     let oldProject = this.items[index];
@@ -87,6 +91,7 @@ export class ProjectService extends CrudService<Project> {
     })
     return found;
   }
+
   isProjectDuplicated(path: string): boolean {
     if (!this.items) return false;
     let found = this.items.find(item => {
@@ -94,13 +99,11 @@ export class ProjectService extends CrudService<Project> {
     });
 
     if (found) return true;
-
     return false;
   }
 
-
-
   async initializeProject(project: Project) {
+    console.log("++++", project.path);
     let started = await this.startProject(project.path).toPromise();
 
     if (started) {

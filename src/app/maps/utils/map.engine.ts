@@ -9,7 +9,7 @@ import { Point } from 'ol/geom';
 import { transform } from 'ol/proj';
 import { Select } from 'ol/interaction';
 import { pointerMove } from 'ol/events/condition';
-import { Image, imageFromOlFeature } from './model/image';
+import { Image, imageFromOlFeature } from '../../image/model/image';
 import { Subject } from 'rxjs';
 import { Style, Stroke, Circle } from 'ol/style';
 
@@ -18,7 +18,7 @@ interface IEventImage {
   pixel?: number[];
 }
 
-export class Mapy
+export class MapEngine
 {
     map: Map;
     view: View = new View({ center: [0, 0], zoom: 1 });

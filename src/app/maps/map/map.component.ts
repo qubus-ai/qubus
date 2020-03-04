@@ -1,7 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Map, View } from 'ol';
-import { Tile } from 'ol/layer';
-import * as OSM from 'ol/source/OSM';
 import { Subscription, timer } from 'rxjs';
 import { SettingsService } from 'src/app/settings.service';
 import { Project } from 'src/app/project/model/project';
@@ -11,7 +8,7 @@ import { ProjecFormComponent } from 'src/app/project/projec-form/projec-form.com
 import { ProjectService } from 'src/app/project/project.service';
 import { ToastService } from 'src/app/toast/toast.service';
 
-import { Mapy } from '../../image/map';
+import { MapEngine } from "../utils/map.engine";
 import { ImageService } from 'src/app/image/image.service';
 import { ImageSize, ImageHorizontalPlacement, ImageVerticalPlacement } from 'src/app/image/image-view/image-view.component';
 import { debounce } from 'rxjs/operators';
@@ -26,7 +23,7 @@ import { UpdateType } from 'src/app/project/model/crud-service';
 })
 export class MapComponent implements OnInit, OnDestroy {
 
-  private mapy: Mapy;
+  private mapEngine: MapEngine;
 
   ImageSize = ImageSize;
   ImageHorizontalPlacement = ImageHorizontalPlacement;
@@ -44,20 +41,20 @@ export class MapComponent implements OnInit, OnDestroy {
               private imageService: ImageService,
               private settingsService: SettingsService,
               private activeProject: ActiveProjectService) { 
-                this.mapy = new Mapy();
+                this.mapEngine = new MapEngine();
               }
 
   async ngOnInit() {
   
-    this.mapy.initialize('map');
+    this.mapEngine.initialize('map');
 
     this.activeProject.getActiveImage().subscribe(data =>{
       if(!data || !data.image ) return;
-      this.mapy.setActiveFeature(data.image.position);
+      this.mapEngine.setActiveFeature(data.image.position);
     })
 
 
-    this.onFeatureHoverSub = this.mapy.onFeatureHover.pipe(debounce(()=>timer(1000))).subscribe( data => {
+    this.onFeatureHoverSub = this.mapEngine.onFeatureHover.pipe(debounce(()=>timer(1000))).subscribe( data => {
       if (data) {
         this.previewImage = data.image;
         this.previewAnchor = data.pixel;
@@ -67,7 +64,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     })
 
-    this.onFeatureClickSub = this.mapy.onFeatureClick.subscribe(data => {
+    this.onFeatureClickSub = this.mapEngine.onFeatureClick.subscribe(data => {
       if(!data) return;
       this.activeProject.selectImage(data.image);
       this.previewImage = null;
@@ -79,9 +76,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
     projects.forEach(project => {
       this.imageService.getFeatureCollection(project.path).subscribe(features =>{
-        this.mapy.addFeatureCollection(project.path, features);
+        this.mapEngine.addFeatureCollection(project.path, features);
         this.imageService.getFeatureUpdate(project.path).subscribe(feature => {
-          this.mapy.addFeature(project.path, feature);
+          this.mapEngine.addFeature(project.path, feature);
         })
       })
     })
@@ -90,12 +87,11 @@ export class MapComponent implements OnInit, OnDestroy {
       if(update.type == UpdateType.SAVE)
       {
         this.projectService.initializeProject(update.item);
-        let a = await this.sleep(5000);
         let fatures =  await this.imageService.getFeatureCollection(update.item.path).toPromise();
 
-        this.mapy.addFeatureCollection(update.item.path, fatures);
+        this.mapEngine.addFeatureCollection(update.item.path, fatures);
         this.imageService.getFeatureUpdate(update.item.path).subscribe(feature => {
-          this.mapy.addFeature(update.item.path, feature);
+          this.mapEngine.addFeature(update.item.path, feature);
         })
       }
     })
@@ -112,8 +108,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   onFileDrop(file: any)
   {
-    console.log("====== ", file);
-
     let project = new Project({path: file.path,name: 'Test'});
     let data = { project: project, state: ProjectFormState.Create }
     const dialogRef = this.dialog.open(ProjecFormComponent, {
@@ -133,13 +127,5 @@ export class MapComponent implements OnInit, OnDestroy {
         })
       }
     });
-  }
-
-
-  sleep(time: number)
-  {
-    return new Promise(resovle =>{
-      setTimeout(resovle, time);
-    })
   }
 }
