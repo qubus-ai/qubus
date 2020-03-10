@@ -1,11 +1,11 @@
 <!-- <div class="blur" [style.background-image]="getUrl(image)" (click)="ccc($event)">
 </div>  -->
-<div class="container">
+<div *ngIf="image" class="container">
     <div>
         <button mat-mini-fab color="primary" class="preview-button" (click)="togglePreview()">List</button>
     </div>
     <div class="preview" *ngIf="previewVisible" [style.min-width.px]="getPreivewSize()">
-        <app-image-list></app-image-list>
+        <app-image-list [project]="project"></app-image-list>
     </div>
     <div class="view" [style.justify-content]="getJustifyContent()" [style.align-items]="getAlignItems()" #view>
         <div class="image-container" [ngStyle]="getImageSize()">

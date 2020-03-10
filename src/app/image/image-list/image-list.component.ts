@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit, Input } from '@angular/core';
 import { ActiveProjectService } from '../../active-project.service';
 import { Image } from '../model/image';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { fromEvent, Subscription } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { ToastService } from '../../toast/toast.service';
@@ -11,6 +11,8 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ImageService } from '../image.service';
+import { Project } from 'src/app/project/model/project';
+import { ProjectService } from 'src/app/project/project.service';
 
 
 @Component({
@@ -33,19 +35,26 @@ export class ImageListComponent implements OnInit, OnDestroy, AfterViewInit {
   contexMenuSubscription: Subscription;
   activeImageSubscription: Subscription;
 
+  @Input() project: Project;
+
   constructor(private activeProjectService: ActiveProjectService,
               private router: Router,
               private toastService: ToastService,
               public dialog: MatDialog,
               public overlay: Overlay,
               public viewContainerRef: ViewContainerRef,
-              private imageService: ImageService) { }
+              private imageService: ImageService,
+              private projectService: ProjectService,
+              private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.images = this.activeProjectService.images;
+    //let index = Number(this.route.snapshot.paramMap.get('id'));
+    //this.project = await this.projectService.getByIndex(index);
+    
   }
 
-  ngAfterViewInit(): void {
+  async ngAfterViewInit() {
+    this.images = await this.imageService.getImages(this.project.path).toPromise();
     this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
       if(!data.image) return;
       let index = this.images.findIndex(item => { return item.name == data.image.name});
@@ -71,7 +80,7 @@ export class ImageListComponent implements OnInit, OnDestroy, AfterViewInit {
   mapView(image: Image)
   {
     this.activeProjectService.selectImage(image);
-    this.router.navigateByUrl('imageMapView');
+    this.router.navigateByUrl('map');
   }
 
   detailView(image: Image)
@@ -115,7 +124,7 @@ export class ImageListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   zoomTo(image: Image)
   {
-    this.activeProjectService.selectImage(image, 'zoom', true);
+    this.activeProjectService.selectImage(image, ['zoom', true]);
   }
 
   getExif(image: Image)

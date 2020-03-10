@@ -23,7 +23,7 @@ import { ImageLoaderDirective } from "./imageLoaderDirective";
     ImageDetailViewComponent,
     ImageLoaderDirective
         ],
-  exports: [ImageLoaderDirective],
+  exports: [ImageLoaderDirective, ImageViewComponent],
   entryComponents: [ExifViewComponent]
 })
 export class ImageModule { }

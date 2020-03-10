@@ -1,6 +1,6 @@
 export enum ImageSortType
 {
-    DATE = 0,
+    DATE = 1,
     NAME
 }
 

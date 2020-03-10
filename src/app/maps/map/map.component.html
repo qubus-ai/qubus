@@ -1,0 +1,11 @@
+<div fileDrop (onFileDropped)="onFileDrop($event)">
+    <div id="map" class="map" #mapa >
+        <div class="image-view">
+            <app-image-view [imageSize]="ImageSize.SMALL" [verticalPlacement]="ImageVerticalPlacement.BOTTOM"
+                [horizontalPlacement]="ImageHorizontalPlacement.LEFT" [imagePlacementEnabled]="true"></app-image-view>
+        </div>
+    </div>
+</div>
+<div class="image-preview" *ngIf="previewImage" [ngStyle]="getPreviewStyle()">
+    <img [src]=previewImage.getSrcThumb()>
+</div>

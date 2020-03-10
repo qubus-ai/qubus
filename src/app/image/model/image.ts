@@ -1,3 +1,15 @@
+import { Feature, Point } from 'geojson';
+import { Feature as OlFeature } from 'ol';
+import { Point as OlPoint } from 'ol/geom';
+import { transform } from 'ol/proj';
+
+export interface IImage
+{
+    name?: string;
+    path?: string;
+    dateString: string
+}
+
 export class Image
 {
     name: string;
@@ -9,16 +21,10 @@ export class Image
     dateString: string;
     date: Date;
 
-    constructor(options: {name?: string, path?: string, thumbnail?: string, size?: {width: number, height: number}, dateString: string})
+    constructor(options: IImage)
     {
         this.name = options.name || '';
         this.path = options.path || '';
-        this.thumbnail = options.thumbnail || '';
-        if(options.size)
-        {
-            this.width = options.size.width;
-            this.height = options.size.height;
-        }
         if(options.dateString)
         {
             this.dateString = options.dateString;
@@ -42,4 +48,21 @@ export class Image
         //if(this.thumbnail) return "file://" + this.thumbnail;
         return "file://" + this.path + '/.thumbs/' + this.name;
     }
+}
+
+export function imageFromFeature(feature: Feature)
+{
+    let image = new Image(<IImage>feature.properties);
+    let point = <Point>(feature.geometry);
+    image.position = transform([point.coordinates[0], point.coordinates[1]], "EPSG:3857", 'EPSG:4326');
+    return image;
+}
+
+export function imageFromOlFeature(feature: OlFeature)
+{
+    let image = new Image(<IImage>feature.getProperties());
+    let point = <OlPoint>feature.getGeometry();
+    let coordinates = point.getCoordinates();
+    image.position = transform([coordinates[0], coordinates[1]], "EPSG:3857", 'EPSG:4326');
+    return image;
 }

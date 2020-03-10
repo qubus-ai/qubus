@@ -68,9 +68,13 @@ export class TaskService {
     this.tasks.push(task);
   }
 
+  getTaskByName(name: string): Task
+  {
+    return this.tasks.find(item => { return item.project == name});
+  }
+
   getTask(project: Project): Task
   {
-    //let path = project ? project.path : "test";
     return this.tasks.find(item => { return item.project == project.path});
   }
 

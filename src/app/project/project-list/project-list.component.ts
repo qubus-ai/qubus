@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ProjectService } from '../project.service';
 import { Project } from '../model/project';
 import { MatDialog } from '@angular/material';
@@ -9,29 +9,43 @@ import { TaskService } from '../task.service';
 import { ProjectFormState } from '../model/state';
 import { Router } from '@angular/router';
 import { ActiveProjectService } from '../../active-project.service';
+import { UpdateType } from '../model/crud-service';
+import { ImageService } from 'src/app/image/image.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css']
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectListComponent implements OnDestroy {
 
   projects: Project[];
 
+  projectUpdateSubscription: Subscription;
+
   constructor(private projectService: ProjectService,
-              public dialog: MatDialog,
-              private toastService: ToastService,
-              private cd: ChangeDetectorRef,
-              private taskService: TaskService,
-              private activeProjectService: ActiveProjectService,
-              private router: Router) {
-    projectService.getAll().subscribe(projects => {
+    public dialog: MatDialog,
+    private toastService: ToastService,
+    private cd: ChangeDetectorRef,
+    private taskService: TaskService,
+    private activeProjectService: ActiveProjectService,
+    private imageService: ImageService,
+    private router: Router) {
+    projectService.get().subscribe(projects => {
       this.projects = projects
     });
+
+    this.projectUpdateSubscription = this.projectService.updateStream.subscribe(update => {
+      if (update.type == UpdateType.SAVE) {
+        this.toastService.success("Project created successfully!");
+        this.projectService.initializeProject(update.item);
+      }
+    })
   }
 
-  ngOnInit() {
+  ngOnDestroy(): void {
+    this.projectUpdateSubscription && this.projectUpdateSubscription.unsubscribe();
   }
 
   addProject(): void {
@@ -41,10 +55,9 @@ export class ProjectListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(project => {
       if (project) {
-        this.projectService.insert(project).subscribe(response => {
+        this.projectService.save(project).subscribe(response => {
           if (response) {
-            this.toastService.success("Project created successfully!");
-            this.projectService.initializeProject(project);
+
           }
           else {
             this.toastService.danger("Project creation failed!");
@@ -83,15 +96,13 @@ export class ProjectListComponent implements OnInit {
   }
 
   openProjectMap(index: number) {
-    this.openProject(index, "/imageMapView");
+    this.openProject(index, "/map");
   }
 
-  openProject(index: number, destination: string) {
-    this.activeProjectService.open(this.projects[index]).subscribe(result => {
-      this.router.navigateByUrl(destination);
-    }, error => {
-      this.toastService.danger("Project cannot be opened");
-    })
+  async openProject(index: number, destination: string) {
+    let images = await this.imageService.getImages(this.projects[index].path).toPromise();
+    this.activeProjectService.selectImage(images[0]);
+    this.router.navigateByUrl(destination);
   }
 
   deleteProject(index: number) {
@@ -104,13 +115,11 @@ export class ProjectListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        let name = this.projects[index].name;
-        this.projectService.remove(index).subscribe(response => {
+        this.projectService.delete(this.projects[index]).subscribe(response => {
           response ? this.toastService.success("Project " + name + " removed.") : this.toastService.danger("Project " + name + "is not removed.");
         })
       }
     }
     )
   }
-
 }
