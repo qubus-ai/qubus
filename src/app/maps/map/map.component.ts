@@ -32,8 +32,10 @@ export class MapComponent implements OnInit, OnDestroy {
   previewImage: Image;
   previewAnchor: number[];
 
-  onFeatureHoverSub: Subscription;
-  onFeatureClickSub: Subscription;
+  onFeatureHoverSubscription: Subscription;
+  onFeatureClickSubscription: Subscription;
+  activeImageSubscription: Subscription;
+  projectUpdateSubscription: Subscription;
   
   constructor(private projectService: ProjectService,
               public dialog: MatDialog,
@@ -48,13 +50,13 @@ export class MapComponent implements OnInit, OnDestroy {
   
     this.mapEngine.initialize('map');
 
-    this.activeProject.getActiveImage().subscribe(data =>{
+    this.activeImageSubscription = this.activeProject.getActiveImage().subscribe(data =>{
       if(!data || !data.image ) return;
       this.mapEngine.setActiveFeature(data.image.position);
     })
 
 
-    this.onFeatureHoverSub = this.mapEngine.onFeatureHover.pipe(debounce(()=>timer(1000))).subscribe( data => {
+    this.onFeatureHoverSubscription = this.mapEngine.onFeatureHover.pipe(debounce(()=>timer(1000))).subscribe( data => {
       if (data) {
         this.previewImage = data.image;
         this.previewAnchor = data.pixel;
@@ -64,7 +66,7 @@ export class MapComponent implements OnInit, OnDestroy {
       }
     })
 
-    this.onFeatureClickSub = this.mapEngine.onFeatureClick.subscribe(data => {
+    this.onFeatureClickSubscription = this.mapEngine.onFeatureClick.subscribe(data => {
       if(!data) return;
       this.activeProject.selectImage(data.image);
       this.previewImage = null;
@@ -83,7 +85,7 @@ export class MapComponent implements OnInit, OnDestroy {
       })
     })
 
-    this.projectService.updateStream.subscribe(async update => {
+    this.projectUpdateSubscription = this.projectService.updateStream.subscribe(async update => {
       if(update.type == UpdateType.SAVE)
       {
         this.projectService.initializeProject(update.item);
@@ -98,8 +100,10 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.onFeatureHoverSub && this.onFeatureHoverSub.unsubscribe();
-    this.onFeatureClickSub && this.onFeatureClickSub.unsubscribe();
+    this.onFeatureHoverSubscription && this.onFeatureHoverSubscription.unsubscribe();
+    this.onFeatureClickSubscription && this.onFeatureClickSubscription.unsubscribe();
+    this.activeImageSubscription && this.activeImageSubscription.unsubscribe();
+    this.projectUpdateSubscription && this.projectUpdateSubscription.unsubscribe();
   }
 
   getPreviewStyle() {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ProjectService } from '../project.service';
 import { Project } from '../model/project';
 import { MatDialog } from '@angular/material';
@@ -11,15 +11,18 @@ import { Router } from '@angular/router';
 import { ActiveProjectService } from '../../active-project.service';
 import { UpdateType } from '../model/crud-service';
 import { ImageService } from 'src/app/image/image.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css']
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectListComponent implements OnDestroy {
 
   projects: Project[];
+
+  projectUpdateSubscription: Subscription;
 
   constructor(private projectService: ProjectService,
     public dialog: MatDialog,
@@ -33,7 +36,7 @@ export class ProjectListComponent implements OnInit {
       this.projects = projects
     });
 
-    this.projectService.updateStream.subscribe(update => {
+    this.projectUpdateSubscription = this.projectService.updateStream.subscribe(update => {
       if (update.type == UpdateType.SAVE) {
         this.toastService.success("Project created successfully!");
         this.projectService.initializeProject(update.item);
@@ -41,7 +44,8 @@ export class ProjectListComponent implements OnInit {
     })
   }
 
-  ngOnInit() {
+  ngOnDestroy(): void {
+    this.projectUpdateSubscription && this.projectUpdateSubscription.unsubscribe();
   }
 
   addProject(): void {
