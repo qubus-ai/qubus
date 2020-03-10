@@ -10,6 +10,7 @@ import { ProjectFormState } from '../model/state';
 import { Router } from '@angular/router';
 import { ActiveProjectService } from '../../active-project.service';
 import { UpdateType } from '../model/crud-service';
+import { ImageService } from 'src/app/image/image.service';
 
 @Component({
   selector: 'app-project-list',
@@ -21,19 +22,19 @@ export class ProjectListComponent implements OnInit {
   projects: Project[];
 
   constructor(private projectService: ProjectService,
-              public dialog: MatDialog,
-              private toastService: ToastService,
-              private cd: ChangeDetectorRef,
-              private taskService: TaskService,
-              private activeProjectService: ActiveProjectService,
-              private router: Router) {
+    public dialog: MatDialog,
+    private toastService: ToastService,
+    private cd: ChangeDetectorRef,
+    private taskService: TaskService,
+    private activeProjectService: ActiveProjectService,
+    private imageService: ImageService,
+    private router: Router) {
     projectService.get().subscribe(projects => {
       this.projects = projects
     });
 
     this.projectService.updateStream.subscribe(update => {
-      if(update.type == UpdateType.SAVE)
-      {
+      if (update.type == UpdateType.SAVE) {
         this.toastService.success("Project created successfully!");
         this.projectService.initializeProject(update.item);
       }
@@ -52,7 +53,7 @@ export class ProjectListComponent implements OnInit {
       if (project) {
         this.projectService.save(project).subscribe(response => {
           if (response) {
-           
+
           }
           else {
             this.toastService.danger("Project creation failed!");
@@ -87,22 +88,17 @@ export class ProjectListComponent implements OnInit {
   }
 
   openProjectGrid(index: number) {
-    this.router.navigateByUrl("/imageGrid/" + index);
-    
-    //this.openProject(index, "/imageGrid");
+    this.openProject(index, "/imageGrid");
   }
 
   openProjectMap(index: number) {
-    this.router.navigateByUrl("/imageMapView/" + index);
-    //this.openProject(index, "/imageMapView");
+    this.openProject(index, "/map");
   }
 
-  openProject(index: number, destination: string) {
-    /*this.activeProjectService.open(this.projects[index]).subscribe(result => {
-      this.router.navigateByUrl(destination);
-    }, error => {
-      this.toastService.danger("Project cannot be opened");
-    })*/
+  async openProject(index: number, destination: string) {
+    let images = await this.imageService.getImages(this.projects[index].path).toPromise();
+    this.activeProjectService.selectImage(images[0]);
+    this.router.navigateByUrl(destination);
   }
 
   deleteProject(index: number) {
@@ -122,5 +118,4 @@ export class ProjectListComponent implements OnInit {
     }
     )
   }
-
 }

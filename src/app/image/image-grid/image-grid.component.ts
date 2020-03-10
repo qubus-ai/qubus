@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ViewContainerRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ViewContainerRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Image } from '../model/image';
 import { Router, ActivatedRoute } from '@angular/router';
 import { fromEvent, Subscription } from 'rxjs';
@@ -36,6 +36,8 @@ export class ImageGridComponent implements OnInit, OnDestroy {
 
   resizeSubscription: Subscription;
 
+  imageSubscription: Subscription;
+
   project: Project;
 
   constructor(private activeProjectService: ActiveProjectService,
@@ -45,16 +47,25 @@ export class ImageGridComponent implements OnInit, OnDestroy {
               public dialog: MatDialog,
               public overlay: Overlay,
               public viewContainerRef: ViewContainerRef,
-              private route: ActivatedRoute,
-              private projectService: ProjectService) {
-                
-               }
+              private projectService: ProjectService) {}
   
-  async ngOnInit() {
-    let index = Number(this.route.snapshot.paramMap.get('id'));
-    this.project = await this.projectService.getByIndex(index);
-    this.images = await this.imageService.getImages(this.project.path).toPromise();
-    this.arrangeImages();
+  ngOnInit() {
+    this.imageSubscription = this.activeProjectService.getActiveImage().subscribe(async data => {
+      if(data)
+      {
+        this.project = await this.projectService.getByPath(data.image.path);
+        this.images = await this.imageService.getImages(this.project.path).toPromise();
+      }
+      else
+      {
+        let projects = await this.projectService.get().toPromise();
+        for(let p of projects)
+        {
+           this.images = this.images.concat(await this.imageService.getImages(p.path).toPromise());
+        }
+      }
+      this.arrangeImages();
+    })
     this.resizeSubscription = fromEvent(window, 'resize').pipe(debounceTime(500)).subscribe((event) => {
       this.arrangeImages();
     })
@@ -62,6 +73,7 @@ export class ImageGridComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.resizeSubscription && this.resizeSubscription.unsubscribe();
+    this.imageSubscription && this.imageSubscription.unsubscribe();
   }
 
   arrangeImages() {
@@ -90,7 +102,7 @@ export class ImageGridComponent implements OnInit, OnDestroy {
 
   mapView(image: Image) {
     this.activeProjectService.selectImage(image);
-    this.router.navigateByUrl('imageMapView');
+    this.router.navigateByUrl('map');
   }
 
   getExif(image: Image) {

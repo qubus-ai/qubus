@@ -118,7 +118,7 @@ export class MapEngine
         point.setCoordinates((transform([coordinates[0], coordinates[1]], 'EPSG:4326', "EPSG:3857")));
         //point.setCoordinates(coordinates);
       }
-
+      this.map.getView().animate({ center: (feature.getGeometry() as Point).getCoordinates(), zoom: 17 });
     }
 
     addImageLayer(featureCollection: FeatureCollection)

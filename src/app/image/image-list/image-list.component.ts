@@ -80,7 +80,7 @@ export class ImageListComponent implements OnInit, OnDestroy, AfterViewInit {
   mapView(image: Image)
   {
     this.activeProjectService.selectImage(image);
-    this.router.navigateByUrl('imageMapView');
+    this.router.navigateByUrl('map');
   }
 
   detailView(image: Image)

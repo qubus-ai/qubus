@@ -33,14 +33,12 @@ export class ImageDetailViewComponent implements OnInit, OnDestroy {
   project: Project;
 
   constructor(private activeProjectService: ActiveProjectService,
-              private projectService: ProjectService,
-              private route: ActivatedRoute) {}
+              private projectService: ProjectService) {}
 
   async ngOnInit() {
-    let index = Number(this.route.snapshot.paramMap.get('id'));
-    this.project = await this.projectService.getByIndex(index);
-    this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(data => {
+    this.activeImageSubscription = this.activeProjectService.getActiveImage().subscribe(async data => {
       this.image = data.image;
+      this.project = await this.projectService.getByPath(this.image.path);
       let img = new Image();
       img.onload = () => {
         this.image.width = img.width;

@@ -1,8 +1,8 @@
 <button mat-fab color="primary" class="appMenu" [matMenuTriggerFor]="appMenu">{{ title }}</button>
 <mat-menu #appMenu="matMenu">
-  <button mat-menu-item *ngIf="isEnabled()" (click)="home()">Projects</button>
-  <button mat-menu-item *ngIf="isEnabled()" routerLink="/imageMapView">Map</button>
-  <button mat-menu-item *ngIf="isEnabled()" routerLink="/imageGrid">List</button>
+  <button mat-menu-item (click)="home()">Projects</button>
+  <button mat-menu-item routerLink="/map">Map</button>
+  <button mat-menu-item routerLink="/imageGrid">List</button>
   <button mat-menu-item (click)="openSettings()">Settings</button>
   <button mat-menu-item (click)="openAbout()">About</button>
   <button mat-menu-item (click)="close()">Close</button>

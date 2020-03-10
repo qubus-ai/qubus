@@ -44,8 +44,9 @@ export class ImageService {
     return from(this.ipcRequest.sendIpcRequest<string, string>(IpcChannel.READ_FILE, filename + '/images.json')).pipe(map(response => {
       let data = JSON.parse(response);
       this.geoJson = data;
+      console.log(data);
       return this.images = data.features.map(feature => {
-        return imageFromFeature(feature.properties);
+        return imageFromFeature(feature);
       })
     }))
   }
