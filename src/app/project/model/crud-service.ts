@@ -1,4 +1,4 @@
-import { ReplaySubject, Observable, of } from "rxjs";
+import { ReplaySubject, Observable, of, Subject } from "rxjs";
 import { tap } from 'rxjs/operators';
 
 export enum UpdateType {
@@ -22,7 +22,7 @@ export abstract class CrudService<T> {
 
     protected items: T[] = null;
 
-    updateStream: ReplaySubject<UpdateDate<T>> = new ReplaySubject();
+    updateStream: Subject<UpdateDate<T>> = new Subject();
 
     get(): Observable<T[]>
     {

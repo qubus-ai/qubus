@@ -23,7 +23,8 @@ export class ProjectService extends CrudService<Project> {
         return new Project(d);
       })
     }), catchError(() => {
-      return of(null);
+      this.items = new Array<Project>();
+      return of(this.items);
     }))
   }
 

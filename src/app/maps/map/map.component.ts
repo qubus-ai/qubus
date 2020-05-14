@@ -88,6 +88,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.projectUpdateSubscription = this.projectService.updateStream.subscribe(async update => {
       if(update.type == UpdateType.SAVE)
       {
+        console.log("++++ map component");
         this.projectService.initializeProject(update.item);
         let fatures =  await this.imageService.getFeatureCollection(update.item.path).toPromise();
 
