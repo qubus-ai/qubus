@@ -63,7 +63,7 @@
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
     "cross-env": "^5.2.0",
-    "electron": "^4.0.8",
+    "electron": "^9.1.0",
     "electron-packager": "^13.1.1",
     "electron-zip-packager": "^4.0.2",
     "jasmine-core": "~2.99.1",
